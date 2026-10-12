@@ -68,6 +68,25 @@ class Laporan:
             "total_transaksi": len(self.sistem.transaksi)
         }
 
+
+    def ringkasanHariIni(self):
+        from datetime import date
+        hari_ini = date.today()
+        jumlah_trx = 0
+        jumlah_alat = 0
+        
+        for trx in self.sistem.transaksi.values():
+            if trx.getTanggalPinjam() == hari_ini:
+                jumlah_trx = jumlah_trx + 1
+                for detail in trx.getDaftarDetail():
+                    jumlah_alat = jumlah_alat + detail.getJumlah()
+        
+        return {
+            "tanggal": hari_ini,
+            "jumlah_transaksi": jumlah_trx,
+            "jumlah_alat_dipinjam": jumlah_alat
+        }
+    
     
     def cetakAlatTersedia(self):
         print("\n===== ALAT TERSEDIA =====")
@@ -128,3 +147,49 @@ class Laporan:
             )
         print(f"Total: {len(daftar)} alat")
 
+    def cetakRiwayatMahasiswa(self, nim):
+        print(f"\n===== RIWAYAT PEMINJAMAN: {nim} =====")
+        
+        try:
+            daftar = self.riwayatMahasiswa(nim)
+        except ValueError as e:
+            print(f"Error: {e}")
+            return
+        
+        if len(daftar) == 0:
+            print("(Belum ada riwayat transaksi)")
+            return
+        
+        mhs = self.sistem.getMahasiswa(nim)
+        print(f"Mahasiswa: {mhs.getNama()}")
+        print(f"Total transaksi: {len(daftar)}")
+        print()
+        
+        for trx in daftar:
+            print(trx.getDetail())
+            print()
+    
+    def cetakStatistik(self):
+        print("\n===== STATISTIK PEMINJAMAN =====")
+        
+        stat = self.statistik()
+        
+        print(f"Total transaksi   : {stat['total_transaksi']}")
+        print(f"  - Selesai       : {stat['transaksi_selesai']}")
+        print(f"  - Aktif         : {stat['transaksi_aktif']}")
+        print()
+        
+        print("Alat Terpopuler:")
+        if len(stat["alat_terpopuler"]) == 0:
+            print("  (Belum ada data)")
+        else:
+            for i, (nama, jumlah) in enumerate(stat["alat_terpopuler"][:5], start=1):
+                print(f"  {i}. {nama} - {jumlah} unit dipinjam")
+        print()
+        
+        print("Mahasiswa Teraktif:")
+        if len(stat["mahasiswa_teraktif"]) == 0:
+            print("  (Belum ada data)")
+        else:
+            for i, (nama, jumlah) in enumerate(stat["mahasiswa_teraktif"][:5], start=1):
+                print(f"  {i}. {nama} - {jumlah} transaksi")
