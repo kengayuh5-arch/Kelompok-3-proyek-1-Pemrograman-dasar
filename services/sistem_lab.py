@@ -1,4 +1,3 @@
-from datetime import date
 from models.mahasiswa import Mahasiswa, MAKS_TRANSAKSI_AKTIF
 from models.alat import Alat
 from models.kategori_alat import KategoriAlat
@@ -14,15 +13,15 @@ class SistemLab:
         self.transaksi = {}
         self.log = []
         self.counter_transaksi = 0
+
     
     def catatLog(self, pesan):
         log_baru = LogAktivitas(pesan)
         self.log.append(log_baru)
     
-    # ===== CRUD MAHASISWA =====
     def tambahMahasiswa(self, nim, nama, no_hp):
         if nim in self.mahasiswa:
-            raise ValueError(f"Mahasiswa dengan NIM {nim} sudah terdaftar!")
+            raise ValueError(f"Mohon maaf mahasiswa dengan NIM {nim} sudah terdaftar")
         mhs = Mahasiswa(nim, nama, no_hp)
         self.mahasiswa[nim] = mhs
         self.catatLog(f"Mahasiswa {nim} ({nama}) ditambahkan")
@@ -30,13 +29,13 @@ class SistemLab:
     
     def editMahasiswa(self, nim, nama="", no_hp=""):
         if nim not in self.mahasiswa:
-            raise ValueError(f"Mahasiswa dengan NIM {nim} tidak ditemukan!")
+            raise ValueError(f"Mohon maaf mahasiswa  dengan NIM {nim} tidak ditemukan")
         self.mahasiswa[nim].ubahData(nama, no_hp)
         self.catatLog(f"Data mahasiswa {nim} diperbarui")
     
     def hapusMahasiswa(self, nim):
         if nim not in self.mahasiswa:
-            raise ValueError(f"Mahasiswa dengan NIM {nim} tidak ditemukan!")
+            raise ValueError(f"Mohon maaf mahasiswa dengan NIM {nim} tidak ditemukan")
         mhs = self.mahasiswa[nim]
         if mhs.punyaTransaksiAktif():
             raise ValueError(
@@ -57,10 +56,10 @@ class SistemLab:
     
     def getMahasiswa(self, nim):
         if nim not in self.mahasiswa:
-            raise ValueError(f"Mahasiswa dengan NIM {nim} tidak ditemukan!")
+            raise ValueError(f"Mohon maaf mahasiswa dengan NIM {nim} tidak ditemukan")
         return self.mahasiswa[nim]
     
-    # ===== CRUD KATEGORI =====
+
     def tambahKategori(self, id_kategori, nama, deskripsi=""):
         if id_kategori in self.kategori:
             raise ValueError(f"Kategori {id_kategori} sudah ada!")
@@ -73,8 +72,8 @@ class SistemLab:
         if id_kategori not in self.kategori:
             raise ValueError(f"Kategori {id_kategori} tidak ditemukan!")
         return self.kategori[id_kategori]
+
     
-    # ===== CRUD ALAT =====
     def tambahAlat(self, kode, nama, id_kategori, stok=1, kondisi="baik"):
         if kode in self.alat:
             raise ValueError(f"Alat dengan kode {kode} sudah ada!")
@@ -88,20 +87,20 @@ class SistemLab:
     
     def editAlat(self, kode, nama="", id_kategori=None):
         if kode not in self.alat:
-            raise ValueError(f"Alat dengan kode {kode} tidak ditemukan!")
+            raise ValueError(f"Alat dengan kode {kode} tidak ditemukan")
         ktg = None
         if id_kategori is not None:
             if id_kategori not in self.kategori:
-                raise ValueError(f"Kategori {id_kategori} tidak ditemukan!")
+                raise ValueError(f"Kategori {id_kategori} tidak ditemukan")
             ktg = self.kategori[id_kategori]
         self.alat[kode].ubahData(nama, ktg)
         self.catatLog(f"Data alat {kode} diperbarui")
     
     def hapusAlat(self, kode):
         if kode not in self.alat:
-            raise ValueError(f"Alat dengan kode {kode} tidak ditemukan!")
+            raise ValueError(f"Alat dengan kode {kode} tidak ditemukan")
         if self.alatDipakaiTrxAktif(kode):
-            raise ValueError(f"Alat {kode} masih tercatat di transaksi aktif!")
+            raise ValueError(f"Alat {kode} masih tercatat di transaksi aktif")
         nama = self.alat[kode].getNama()
         del self.alat[kode]
         self.catatLog(f"Alat {kode} ({nama}) dihapus")
@@ -118,7 +117,7 @@ class SistemLab:
     
     def getAlat(self, kode):
         if kode not in self.alat:
-            raise ValueError(f"Alat dengan kode {kode} tidak ditemukan!")
+            raise ValueError(f"Alat dengan kode {kode} tidak ditemukan")
         return self.alat[kode]
     
     def alatDipakaiTrxAktif(self, kode):
@@ -130,20 +129,20 @@ class SistemLab:
                     return True
         return False
     
-    # ===== TRANSAKSI =====
+
     def buatTransaksi(self, nim, daftar_item):
         if nim not in self.mahasiswa:
-            raise ValueError(f"Mahasiswa dengan NIM {nim} tidak ditemukan!")
+            raise ValueError(f"Mahasiswa dengan NIM {nim} tidak ditemukan")
         mhs = self.mahasiswa[nim]
         
         if not mhs.bisaPinjamLagi():
             raise ValueError(
                 f"Mahasiswa {mhs.getNama()} sudah punya "
-                f"{MAKS_TRANSAKSI_AKTIF} transaksi aktif!"
+                f"{MAKS_TRANSAKSI_AKTIF} transaksi aktif"
             )
         
         if not daftar_item or len(daftar_item) == 0:
-            raise ValueError("Transaksi harus punya minimal 1 alat!")
+            raise ValueError("Transaksi harus punya minimal 1 alat")
         
         for kode, jumlah in daftar_item:
             if kode not in self.alat:
@@ -155,16 +154,16 @@ class SistemLab:
                     f"(kondisi: {alat.getKondisi()}, stok: {alat.getStok()})"
                 )
             if type(jumlah) != int or jumlah <= 0:
-                raise ValueError(f"Jumlah untuk {kode} harus integer > 0!")
+                raise ValueError(f"Jumlah untuk {kode} harus integer > 0")
             if jumlah > alat.getStok():
                 raise ValueError(
-                    f"Stok {alat.getNama()} tidak cukup! "
+                    f"Stok {alat.getNama()} tidak cukup "
                     f"Tersedia: {alat.getStok()}, diminta: {jumlah}"
                 )
         
         self.counter_transaksi = self.counter_transaksi + 1
         
-        # Padding manual (bukan :03d)
+   
         angka_str = str(self.counter_transaksi)
         while len(angka_str) < 3:
             angka_str = "0" + angka_str
@@ -184,10 +183,10 @@ class SistemLab:
     
     def prosesPengembalian(self, id_trx, kode_alat, kondisi):
         if id_trx not in self.transaksi:
-            raise ValueError(f"Transaksi {id_trx} tidak ditemukan!")
+            raise ValueError(f"Transaksi {id_trx} tidak ditemukan")
         trx = self.transaksi[id_trx]
         if not trx.isAktif():
-            raise ValueError(f"Transaksi {id_trx} sudah selesai!")
+            raise ValueError(f"Transaksi {id_trx} sudah selesai")
         trx.kembalikanAlat(kode_alat, kondisi)
         self.catatLog(
             f"{trx.getMahasiswa().getNama()} mengembalikan {kode_alat} "
@@ -196,12 +195,12 @@ class SistemLab:
     
     def getTransaksi(self, id_trx):
         if id_trx not in self.transaksi:
-            raise ValueError(f"Transaksi {id_trx} tidak ditemukan!")
+            raise ValueError(f"Transaksi {id_trx} tidak ditemukan")
         return self.transaksi[id_trx]
     
     def cariTransaksiByMahasiswa(self, nim):
         if nim not in self.mahasiswa:
-            raise ValueError(f"Mahasiswa dengan NIM {nim} tidak ditemukan!")
+            raise ValueError(f"Mahasiswa dengan NIM {nim} tidak ditemukan")
         hasil = []
         for trx in self.transaksi.values():
             if trx.getMahasiswa().getNim() == nim:
@@ -210,14 +209,14 @@ class SistemLab:
     
     def trxAktifMahasiswa(self, nim):
         if nim not in self.mahasiswa:
-            raise ValueError(f"Mahasiswa dengan NIM {nim} tidak ditemukan!")
+            raise ValueError(f"Mahasiswa dengan NIM {nim} tidak ditemukan")
         hasil = []
         for trx in self.transaksi.values():
             if trx.getMahasiswa().getNim() == nim and trx.isAktif():
                 hasil.append(trx)
         return hasil
-    
-    # ===== QUERY =====
+
+
     def getAlatTersedia(self):
         hasil = []
         for alat in self.alat.values():
@@ -239,18 +238,3 @@ class SistemLab:
                 hasil.append(alat)
         return hasil
     
-    # ===== SEED DATA =====
-    def seedDataDummy(self):
-        self.tambahKategori("KTG001", "Perangkat Komputasi", "Laptop, PC, dll")
-        self.tambahKategori("KTG002", "Perangkat Jaringan", "Router, Switch, dll")
-        self.tambahKategori("KTG003", "Perangkat Multimedia", "Kamera, Proyektor, dll")
-        
-        self.tambahAlat("ALT001", "Laptop", "KTG001", 5)
-        self.tambahAlat("ALT002", "Mouse", "KTG001", 10)
-        self.tambahAlat("ALT003", "Router", "KTG002", 3)
-        self.tambahAlat("ALT004", "Kamera Digital", "KTG003", 2)
-        self.tambahAlat("ALT005", "Proyektor", "KTG003", 1)
-        
-        self.tambahMahasiswa("K3525001", "Bintang", "081111111111")
-        self.tambahMahasiswa("K3525031", "Ken", "082222222222")
-        self.tambahMahasiswa("K3525046", "Afrizal", "083333333333")
