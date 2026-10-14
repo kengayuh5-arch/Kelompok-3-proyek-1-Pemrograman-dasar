@@ -88,7 +88,11 @@ class Alat:
             self.__stok = 1
     
     def getDetail(self):
-        status = "Tersedia" if self.isTersedia() else "Tidak Tersedia"
+        if self.isTersedia():
+            status = "Tersedia"
+        else:
+            status = "Tidak Tersedia"
+        
         return (
             f"[{self.kode}] {self.nama} | "
             f"Kategori: {self.kategori.getNama()} | "
