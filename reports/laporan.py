@@ -1,9 +1,9 @@
-from services.sistem_lab import 
+from services.sistem_lab import SistemLab
 
 
 class Laporan:
     def __init__(self, sistem):
-        if type(sistem) != :
+        if type(sistem) != SistemLab:
             raise ValueError("Sistem harus berupa objek SistemLab")
         self.sistem = sistem
     
@@ -21,7 +21,6 @@ class Laporan:
     
     def cariTransaksiByMahasiswa(self, nim):
         return self.sistem.cariTransaksiByMahasiswa(nim)
-
     
     def statistik(self):
         hitung_alat = {}
@@ -32,7 +31,7 @@ class Laporan:
                 if nama not in hitung_alat:
                     hitung_alat[nama] = 0
                 hitung_alat[nama] = hitung_alat[nama] + jumlah
-
+        
         alat_terpopuler = sorted(
             hitung_alat.items(),
             key=lambda x: x[1],
@@ -67,8 +66,7 @@ class Laporan:
             "transaksi_aktif": aktif,
             "total_transaksi": len(self.sistem.transaksi)
         }
-
-
+    
     def ringkasanHariIni(self):
         from datetime import date
         hari_ini = date.today()
@@ -87,68 +85,65 @@ class Laporan:
             "jumlah_alat_dipinjam": jumlah_alat
         }
     
-    
     def cetakAlatTersedia(self):
-        print("\n===== ALAT TERSEDIA =====")
+        print("\n===== Alat Tersedia =====")
         daftar = self.alatTersedia()
         
         if len(daftar) == 0:
             print("(Tidak ada alat tersedia)")
             return
         
-        print(f"{'KODE':<10} | {'NAMA':<15} | {'KATEGORI':<20} | {'STOK':<5}")
+        print(f"{'KODE':<10} | {'NAMA':<15} | {'KATEGORI':<20} | STOK")
         print("-" * 60)
         for a in daftar:
             print(
                 f"{a.getKode():<10} | "
                 f"{a.getNama():<15} | "
                 f"{a.getKategori().getNama():<20} | "
-                f"{a.getStok():<5}"
+                f"{a.getStok()}"
             )
         print(f"Total: {len(daftar)} alat")
-
     
     def cetakAlatDipinjam(self):
-        print("\n===== ALAT SEDANG DIPINJAM =====")
+        print("\n===== Alat Sedang Dipinjam =====")
         daftar = self.alatDipinjam()
         
         if len(daftar) == 0:
             print("(Tidak ada alat sedang dipinjam)")
             return
         
-        print(f"{'KODE':<10} | {'NAMA':<15} | {'KATEGORI':<20} | {'STOK':<5}")
+        print(f"{'KODE':<10} | {'NAMA':<15} | {'KATEGORI':<20} | STOK")
         print("-" * 60)
         for a in daftar:
             print(
                 f"{a.getKode():<10} | "
                 f"{a.getNama():<15} | "
                 f"{a.getKategori().getNama():<20} | "
-                f"{a.getStok():<5}"
+                f"{a.getStok()}"
             )
         print(f"Total: {len(daftar)} alat")
-
     
     def cetakAlatRusak(self):
-        print("\n===== ALAT RUSAK =====")
+        print("\n===== Alat Rusak =====")
         daftar = self.alatRusak()
         
         if len(daftar) == 0:
             print("(Tidak ada alat rusak)")
             return
         
-        print(f"{'KODE':<10} | {'NAMA':<15} | {'KATEGORI':<20} | {'KONDISI':<15}")
+        print(f"{'KODE':<10} | {'NAMA':<15} | {'KATEGORI':<20} | KONDISI")
         print("-" * 65)
         for a in daftar:
             print(
                 f"{a.getKode():<10} | "
                 f"{a.getNama():<15} | "
                 f"{a.getKategori().getNama():<20} | "
-                f"{a.getKondisi():<15}"
+                f"{a.getKondisi()}"
             )
         print(f"Total: {len(daftar)} alat")
-
+    
     def cetakRiwayatMahasiswa(self, nim):
-        print(f"\n===== RIWAYAT PEMINJAMAN: {nim} =====")
+        print(f"\n===== Riwayat Peminjaman: {nim} =====")
         
         try:
             daftar = self.riwayatMahasiswa(nim)
@@ -170,7 +165,7 @@ class Laporan:
             print()
     
     def cetakStatistik(self):
-        print("\n===== STATISTIK PEMINJAMAN =====")
+        print("\n===== Statistik Peminjaman =====")
         
         stat = self.statistik()
         
@@ -193,3 +188,4 @@ class Laporan:
         else:
             for i, (nama, jumlah) in enumerate(stat["mahasiswa_teraktif"][:5], start=1):
                 print(f"  {i}. {nama} - {jumlah} transaksi")
+
