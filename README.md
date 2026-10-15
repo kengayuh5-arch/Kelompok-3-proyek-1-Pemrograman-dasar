@@ -3,9 +3,11 @@ Sistem Pengelolaan Peminjaman Peralatan Laboratorium
 
 
 ## Anggota Kelompok
-| Nama | NIM | Akun GitHub |
-|------|-----|-------------|
-|      |     |             |
+| Nama                       | NIM      | Akun GitHub      |
+|----------------------------|----------|------------------|
+| Bintang Fajar Khoiru Rizal | K3525001 | BitangFajar-blip |
+| Ken Gayuh Nusa Islami      | K3525031 | kengayuh5-arch   |
+| Afrizal Affandi Ahmad      | K3525046 | afrizal-aff      |
 
 ## Deskripsi Sistem
 Aplikasi CLI berbasis Python (OOP, tanpa database) untuk mengelola peminjaman
@@ -24,6 +26,8 @@ sistem_peminjaman_lab/
 ```
 
 ## Pembagian Kontribusi
-| Anggota | Kontribusi |
-|---------|------------|
-|         |            |
+| Anggota                    | Kontribusi                                                |
+|----------------------------|-----------------------------------------------------------|
+| Bintang Fajar Khoiru Rizal | detail_peminjaman.py, transaksi.py, sistem_lab.py         |
+| Ken Gayuh Nusa Islami      | alat.py, kategori_alat.py, mahasiswa.py, log_aktivitas.py |
+| Afrizal Affandi Ahmad      | laporan.py, menu_app.py, main.py, README.md               |
