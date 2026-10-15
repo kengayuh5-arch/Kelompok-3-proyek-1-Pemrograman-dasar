@@ -29,5 +29,6 @@ sistem_peminjaman_lab/
 | Anggota                    | Kontribusi                                                |
 |----------------------------|-----------------------------------------------------------|
 | Bintang Fajar Khoiru Rizal | detail_peminjaman.py, transaksi.py, sistem_lab.py         |
-| Ken Gayuh Nusa Islami      | alat.py, kategori_alat.py, mahasiswa.py, log_aktivitas.py |
-| Afrizal Affandi Ahmad      | laporan.py, menu_app.py, main.py, README.md               |
+| Afrizal Affandi Ahmad      | alat.py, kategori_alat.py, mahasiswa.py, log_aktivitas.py |
+| Ken Gayuh Nusa Islami      | laporan.py, menu_app.py, main.py, README.md               |
+
