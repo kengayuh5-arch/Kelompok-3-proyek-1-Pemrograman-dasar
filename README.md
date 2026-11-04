@@ -22,6 +22,7 @@ sistem_peminjaman_lab/
 ├── models/      # mahasiswa, kategori_alat, alat, detail_peminjaman, transaksi, log_aktivitas
 ├── services/    # sistem_lab.py (manager + aturan bisnis)
 ├── reports/     # laporan.py
+├── data/        # Data dummy
 └── ui/          # menu_app.py (CLI)
 ```
 
