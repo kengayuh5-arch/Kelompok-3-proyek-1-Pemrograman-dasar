@@ -227,8 +227,12 @@ class SistemLab:
     def getAlatDipinjam(self):
         hasil = []
         for alat in self.alat.values():
-            if not alat.isTersedia() and alat.getKondisi() == "baik":
-                hasil.append(alat)
+            for trx in self.transaksi.values():
+                if trx.isAktif():
+                    for detail in trx.getDaftarDetail():
+                        if detail.getAlat().getKode() == alat.getKode() and not detail.isKembali():
+                            if alat not in hasil:
+                                hasil.append(alat)
         return hasil
     
     def getAlatRusak(self):
