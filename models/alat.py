@@ -2,7 +2,6 @@ from models.kategori_alat import KategoriAlat
 
 KONDISI_VALID = ["baik", "rusak ringan", "rusak berat"]
 
-
 class Alat:
     def __init__(self, kode, nama, kategori, stok=1, kondisi="baik"):
         if not kode or type(kode) != str:
@@ -19,8 +18,19 @@ class Alat:
         self.kode = kode
         self.nama = nama
         self.kategori = kategori
-        self.__stok = stok
-        self.__kondisi = kondisi
+        
+        self.__stok_baik = 0
+        self.__stok_rusak_ringan = 0
+        self.__stok_rusak_berat = 0
+
+
+        
+        if kondisi == "baik":
+            self.__stok_baik = stok
+        elif kondisi == "rusak ringan":
+            self.__stok_rusak_ringan = stok
+        elif kondisi == "rusak berat":
+            self.__stok_rusak_berat = stok
     
     def getKode(self):
         return self.kode
@@ -31,72 +41,74 @@ class Alat:
     def getKategori(self):
         return self.kategori
     
-    def getStok(self):
-        return self.__stok
+    def getStokBaik(self):
+        return self.__stok_baik
     
-    def getKondisi(self):
-        return self.__kondisi
+    def getStokRusakRingan(self):
+        return self.__stok_rusak_ringan
     
+    def getStokRusakBerat(self):
+        return self.__stok_rusak_berat
+        
+
+
     def isTersedia(self):
-        return self.__kondisi == "baik" and self.__stok > 0
+        return self.__stok_baik > 0 
     
-    def ubahData(self, nama="", kategori=None):
+    def ubahData(self, nama="", kategori=None, tambah_stok=0, perbaikan_ringan=0, perbaikan_berat=0):
         if nama:
-            if not nama:
-                raise ValueError("Nama alat tidak boleh kosong!")
             self.nama = nama
         
         if kategori is not None:
             if type(kategori) != KategoriAlat:
                 raise ValueError("Kategori harus berupa objek KategoriAlat!")
             self.kategori = kategori
+            
+        if tambah_stok > 0:
+            self.__stok_baik = self.__stok_baik + tambah_stok
+            
+        if perbaikan_ringan > 0:
+            if perbaikan_ringan > self.__stok_rusak_ringan:
+                raise ValueError(f"Gagal! Jumlah perbaikan ({perbaikan_ringan}) melebihi stok rusak ringan yang ada ({self.__stok_rusak_ringan}).")
+            self.__stok_rusak_ringan = self.__stok_rusak_ringan - perbaikan_ringan
+            self.__stok_baik = self.__stok_baik + perbaikan_ringan
+            
+        if perbaikan_berat > 0:
+            if perbaikan_berat > self.__stok_rusak_berat:
+                raise ValueError(f"Gagal! Jumlah perbaikan ({perbaikan_berat}) melebihi stok rusak berat yang ada ({self.__stok_rusak_berat}).")
+            self.__stok_rusak_berat = self.__stok_rusak_berat - perbaikan_berat
+            self.__stok_baik = self.__stok_baik + perbaikan_berat
+
+
     
     def pinjam(self, jumlah=1):
         if not self.isTersedia():
-            raise ValueError(
-                f"Alat {self.nama} tidak tersedia. "
-                f"Kondisi: {self.__kondisi}, Stok: {self.__stok}"
-            )
+            raise ValueError(f"Alat {self.nama} tidak tersedia (Stok Baik habis).")
         if jumlah <= 0:
             raise ValueError("Jumlah pinjam harus lebih dari 0!")
-        if jumlah > self.__stok:
-            raise ValueError(
-                f"Stok {self.nama} tidak cukup! "
-                f"Tersedia: {self.__stok}, diminta: {jumlah}"
-            )
-        self.__stok = self.__stok - jumlah
+        if jumlah > self.__stok_baik:
+            raise ValueError(f"Stok baik {self.nama} tidak cukup! Tersedia: {self.__stok_baik}, diminta: {jumlah}")
+        
+        self.__stok_baik = self.__stok_baik - jumlah
     
     def kembali(self, kondisi, jumlah=1):
         if kondisi not in KONDISI_VALID:
-            raise ValueError(f"Kondisi '{kondisi}' tidak valid. Pilih: {KONDISI_VALID}")
-        
-        self.__kondisi = kondisi
+            raise ValueError(f"Kondisi '{kondisi}' tidak valid.")
         
         if kondisi == "baik":
-            self.__stok = self.__stok + jumlah
-    
-    def masukPemeliharaan(self):
-        if self.__kondisi != "rusak berat":
-            raise ValueError(
-                f"Hanya alat rusak berat yang bisa masuk pemeliharaan. "
-                f"Kondisi saat ini: {self.__kondisi}"
-            )
-    
-    def selesaiPerbaikan(self):
-        self.__kondisi = "baik"
-        if self.__stok == 0:
-            self.__stok = 1
+            self.__stok_baik = self.__stok_baik + jumlah
+        elif kondisi == "rusak ringan":
+            self.__stok_rusak_ringan = self.__stok_rusak_ringan + jumlah
+        elif kondisi == "rusak berat":
+            self.__stok_rusak_berat = self.__stok_rusak_berat + jumlah
     
     def getDetail(self):
-        if self.isTersedia():
-            status = "Tersedia"
-        else:
-            status = "Tidak Tersedia"
-        
+        status = "Tersedia" if self.isTersedia() else "Tidak Tersedia"
         return (
             f"[{self.kode}] {self.nama} | "
             f"Kategori: {self.kategori.getNama()} | "
-            f"Kondisi: {self.__kondisi} | "
-            f"Stok: {self.__stok} | "
+            f"Baik: {self.__stok_baik} | "
+            f"R.Ringan: {self.__stok_rusak_ringan} | "
+            f"R.Berat: {self.__stok_rusak_berat} | "
             f"{status}"
         )

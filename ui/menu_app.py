@@ -243,21 +243,17 @@ class MenuApp:
     
     def tampilkanSemuaAlat(self):
         print("\n===== Daftar semua alat =====")
-        
         if len(self.sistem.alat) == 0:
             print("(Belum ada alat)")
             self.pause()
             return
         
-        print(f"{'KODE':<10} | {'NAMA':<15} | {'KATEGORI':<20} | {'KONDISI':<14} | STOK")
+        print(f"{'KODE':<8} | {'NAMA':<12} | {'KATEGORI':<15} | {'BAIK':<4} | {'R.RINGAN':<8} | {'R.BERAT':<7}")
         print("-" * 75)
         for a in self.sistem.alat.values():
             print(
-                f"{a.getKode():<10} | "
-                f"{a.getNama():<15} | "
-                f"{a.getKategori().getNama():<20} | "
-                f"{a.getKondisi():<14} | "
-                f"{a.getStok()}"
+                f"{a.getKode():<8} | {a.getNama():<12} | {a.getKategori().getNama():<15} | "
+                f"{a.getStokBaik():<4} | {a.getStokRusakRingan():<8} | {a.getStokRusakBerat():<7}"
             )
         print(f"Total: {len(self.sistem.alat)} alat")
         self.pause()
@@ -309,8 +305,8 @@ class MenuApp:
             kode = self.inputValid("Kode alat yang mau diedit: ")
             alat = self.sistem.getAlat(kode)
             
-            print(f"Data saat ini: {alat.getDetail()}")
-            print("(Kosongkan kalau tidak mau ubah)")
+            print(f"\nData saat ini: {alat.getDetail()}")
+            print("(Kosongkan jika tidak ada perubahan, isi angka jika ada)")
             
             nama = input("Nama baru: ").strip()
             
@@ -321,11 +317,22 @@ class MenuApp:
             id_ktg_input = input("ID kategori baru: ").strip()
             if id_ktg_input:
                 id_ktg = id_ktg_input
+                
+            print("\n--- Aksi Stok dan Perbaikan ---")
             
-            self.sistem.editAlat(kode, nama, id_ktg)
-            print("Data alat berhasil diperbarui")
+            tambah_input = input("Tambah stok baru       : ").strip()
+            tambah_stok = int(tambah_input) if tambah_input else 0
+            
+            ringan_input = input("Perbaikan Rusak Ringan : ").strip()
+            perbaikan_ringan = int(ringan_input) if ringan_input else 0
+            
+            berat_input = input("Perbaikan Rusak Berat  : ").strip()
+            perbaikan_berat = int(berat_input) if berat_input else 0
+            
+            self.sistem.editAlat(kode, nama, id_ktg, tambah_stok, perbaikan_ringan, perbaikan_berat)
+            print("\nData alat berhasil diperbarui!")
         except ValueError as e:
-            print(f"Error: {e}")
+            print(f"\nError: {e}")
         self.pause()
     
     def hapusAlat(self):
@@ -440,7 +447,7 @@ class MenuApp:
                 
                 try:
                     alat = self.sistem.getAlat(kode)
-                    print(f"  -> {alat.getNama()} (stok: {alat.getStok()})")
+                    print(f"  -> {alat.getNama()} (stok: {alat.getStokBaik()})")
                     jumlah = self.inputAngka("  Jumlah: ")
                     daftar_item.append((kode, jumlah))
                 except ValueError as e:

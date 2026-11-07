@@ -93,14 +93,14 @@ class Laporan:
             print("(Tidak ada alat tersedia)")
             return
         
-        print(f"{'KODE':<10} | {'NAMA':<15} | {'KATEGORI':<20} | STOK")
-        print("-" * 60)
+        print(f"{'KODE':<10} | {'NAMA':<15} | {'KATEGORI':<20} | STOK BAIK")
+        print("-" * 65)
         for a in daftar:
             print(
                 f"{a.getKode():<10} | "
                 f"{a.getNama():<15} | "
                 f"{a.getKategori().getNama():<20} | "
-                f"{a.getStok()}"
+                f"{a.getStokBaik()}"
             )
         print(f"Total: {len(daftar)} alat")
     
@@ -112,14 +112,14 @@ class Laporan:
             print("(Tidak ada alat sedang dipinjam)")
             return
         
-        print(f"{'KODE':<10} | {'NAMA':<15} | {'KATEGORI':<20} | STOK")
-        print("-" * 60)
+        print(f"{'KODE':<10} | {'NAMA':<15} | {'KATEGORI':<20} | STOK BAIK")
+        print("-" * 65)
         for a in daftar:
             print(
                 f"{a.getKode():<10} | "
                 f"{a.getNama():<15} | "
                 f"{a.getKategori().getNama():<20} | "
-                f"{a.getStok()}"
+                f"{a.getStokBaik()}"
             )
         print(f"Total: {len(daftar)} alat")
     
@@ -131,14 +131,15 @@ class Laporan:
             print("(Tidak ada alat rusak)")
             return
         
-        print(f"{'KODE':<10} | {'NAMA':<15} | {'KATEGORI':<20} | KONDISI")
-        print("-" * 65)
+        print(f"{'KODE':<10} | {'NAMA':<15} | {'KATEGORI':<20} | RUSAK RINGAN | RUSAK BERAT")
+        print("-" * 85)
         for a in daftar:
             print(
                 f"{a.getKode():<10} | "
                 f"{a.getNama():<15} | "
                 f"{a.getKategori().getNama():<20} | "
-                f"{a.getKondisi()}"
+                f"{a.getStokRusakRingan():<12} | "
+                f"{a.getStokRusakBerat()}"
             )
         print(f"Total: {len(daftar)} alat")
     
