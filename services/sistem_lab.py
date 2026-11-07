@@ -74,18 +74,18 @@ class SistemLab:
         return self.kategori[id_kategori]
 
     
-    def tambahAlat(self, kode, nama, id_kategori, stok=1, kondisi="baik"):
+    def tambahAlat(self, kode, nama, id_kategori, stok=1):
         if kode in self.alat:
             raise ValueError(f"Alat dengan kode {kode} sudah ada!")
         if id_kategori not in self.kategori:
             raise ValueError(f"Kategori {id_kategori} tidak ditemukan!")
         ktg = self.kategori[id_kategori]
-        alat = Alat(kode, nama, ktg, stok, kondisi)
+        alat = Alat(kode, nama, ktg, stok, "baik")
         self.alat[kode] = alat
         self.catatLog(f"Alat {kode} ({nama}) ditambahkan")
         return alat
     
-    def editAlat(self, kode, nama="", id_kategori=None):
+    def editAlat(self, kode, nama="", id_kategori=None, tambah_stok=0, perbaikan_ringan=0, perbaikan_berat=0):
         if kode not in self.alat:
             raise ValueError(f"Alat dengan kode {kode} tidak ditemukan")
         ktg = None
@@ -93,7 +93,8 @@ class SistemLab:
             if id_kategori not in self.kategori:
                 raise ValueError(f"Kategori {id_kategori} tidak ditemukan")
             ktg = self.kategori[id_kategori]
-        self.alat[kode].ubahData(nama, ktg)
+            
+        self.alat[kode].ubahData(nama, ktg, tambah_stok, perbaikan_ringan, perbaikan_berat)
         self.catatLog(f"Data alat {kode} diperbarui")
     
     def hapusAlat(self, kode):
@@ -149,17 +150,16 @@ class SistemLab:
                 raise ValueError(f"Alat dengan kode {kode} tidak ditemukan!")
             alat = self.alat[kode]
             if not alat.isTersedia():
-                raise ValueError(
-                    f"Alat {alat.getNama()} tidak tersedia "
-                    f"(kondisi: {alat.getKondisi()}, stok: {alat.getStok()})"
-                )
+                raise ValueError(f"Alat {alat.getNama()} tidak tersedia (Stok Baik habis).")
+            
             if type(jumlah) != int or jumlah <= 0:
                 raise ValueError(f"Jumlah untuk {kode} harus integer > 0")
-            if jumlah > alat.getStok():
+            
+            if jumlah > alat.getStokBaik():
                 raise ValueError(
-                    f"Stok {alat.getNama()} tidak cukup "
-                    f"Tersedia: {alat.getStok()}, diminta: {jumlah}"
-                )
+                    f"Stok {alat.getNama()} tidak cukup! "
+                    f"Tersedia: {alat.getStokBaik()}, diminta: {jumlah}"
+    )
         
         self.counter_transaksi = self.counter_transaksi + 1
         
@@ -238,7 +238,7 @@ class SistemLab:
     def getAlatRusak(self):
         hasil = []
         for alat in self.alat.values():
-            if alat.getKondisi() in ["rusak ringan", "rusak berat"]:
+            if alat.getStokRusakRingan() > 0 or alat.getStokRusakBerat() > 0:
                 hasil.append(alat)
         return hasil
     
