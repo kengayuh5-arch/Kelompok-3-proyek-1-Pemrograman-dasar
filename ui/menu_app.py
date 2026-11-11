@@ -29,6 +29,7 @@ class MenuApp:
     def pause(self):
         input("\n(Tekan Enter untuk lanjut)")
     
+        
     def jalankan(self):
         print("\n" + "=" * 40)
         print("  Sistem pengelolaan peminjaman alat")
@@ -37,25 +38,21 @@ class MenuApp:
         while True:
             try:
                 self.tampilkanMenu()
-                pilihan = input("Silahkan pilih menu program (0-6): ").strip()
+                pilihan = input("Silahkan pilih menu program (0-8): ").strip()
                 
-                if pilihan == "1":
-                    self.menuMahasiswa()
-                elif pilihan == "2":
-                    self.menuAlat()
-                elif pilihan == "3":
-                    self.menuTransaksi()
-                elif pilihan == "4":
-                    self.menuPengembalian()
-                elif pilihan == "5":
-                    self.menuLaporan()
-                elif pilihan == "6":
-                    self.menuLog()
+                if pilihan == "1": self.menuMahasiswa()
+                elif pilihan == "2": self.menuAlat()
+                elif pilihan == "3": self.menuTransaksi()
+                elif pilihan == "4": self.menuPengembalian()
+                elif pilihan == "5": self.menuLaporan()
+                elif pilihan == "6": self.menuLog()
+                elif pilihan == "7": self.menuBackup()
+                elif pilihan == "8": self.menuEksporLaporan()
                 elif pilihan == "0":
                     print("\nProgram selesai. Terima kasih")
                     break
                 else:
-                    print("\nPilihan tidak valid. silahkan pilih kembali")
+                    print("\nPilihan tidak valid. Silahkan pilih kembali")
             
             except Exception as e:
                 print(f"\nError tak terduga: {e}")
@@ -71,6 +68,8 @@ class MenuApp:
         print("4. Proses pengembalian alat")
         print("5. Laporan dan statistik")
         print("6. Lihat log aktivitas")
+        print("7. Backup & Restore Data")
+        print("8. Ekspor Laporan ke File")
         print("0. Keluar")
         print("-" * 40)
     
@@ -422,6 +421,7 @@ class MenuApp:
                 break
             else:
                 print("Pilihan tidak valid. silahkan pilih kembali")
+
     
     def buatTransaksi(self):
         print("\n=== Buat Transaksi Baru ===")
@@ -474,6 +474,7 @@ class MenuApp:
         except ValueError as e:
             print(f"\nError: {e}")
         self.pause()
+
     
     def tampilkanSemuaTransaksi(self):
         print("\n===== Daftar Semua Transaksi =====")
@@ -603,6 +604,7 @@ class MenuApp:
                 break
             else:
                 print("Pilihan tidak valid. Silahkan pilih kembali")
+
     
     def ringkasanHariIni(self):
         print("\n===== RINGKASAN HARI INI =====")
@@ -632,3 +634,49 @@ class MenuApp:
         self.pause()
 
 
+
+    def menuBackup(self):
+        print("\n=== Menu Backup & Restore ===")
+        print("1. Buat Backup Baru")
+        print("2. Pulihkan Data (Restore)")
+        print("0. Kembali")
+        pilih = input("Pilih (0-2): ").strip()
+        
+        if pilih == "1":
+            nama_backup = self.sistem.file_handler.backup_data()
+            print(f"\nBackup berhasil dibuat dengan nama folder: {nama_backup}")
+            self.pause()
+        elif pilih == "2":
+            daftar = self.sistem.file_handler.daftar_backup()
+            if not daftar:
+                print("\nBelum ada file backup.")
+                self.pause()
+                return
+            
+            print("\nDaftar Backup Tersedia:")
+            for i, bkp in enumerate(daftar, 1):
+                print(f"{i}. {bkp}")
+                
+            idx = self.inputAngka("Pilih nomor backup: ")
+            if 1 <= idx <= len(daftar):
+                berhasil = self.sistem.file_handler.restore_data(daftar[idx-1])
+                if berhasil:
+                    print("\nData berhasil dipulihkan! Silahkan restart program untuk melihat perubahan.")
+                else:
+                    print("\nGagal memulihkan data.")
+            else:
+                print("\nPilihan tidak valid.")
+            self.pause()
+
+
+    def menuEksporLaporan(self):
+        print("\n=== Ekspor Laporan ===")
+        teks_laporan = self.laporan.buat_teks_laporan()
+        nama_file = input("Masukkan nama file (contoh: laporan_lab.txt): ").strip()
+        
+        if not nama_file.endswith(".txt"):
+            nama_file += ".txt"
+            
+        self.sistem.file_handler.simpan_laporan(nama_file, teks_laporan)
+        print(f"\nLaporan berhasil disimpan di folder 'laporan/{nama_file}'")
+        self.pause()
