@@ -1,1 +1,10 @@
-AL01|Router|KT01|15|0|0
+AL01|Router|KT01|13|0|0
+AL02|switch|KT01|4|0|0
+AL03|Keyboard|KT02|8|0|0
+AL04|Mouse|KT02|3|0|0
+AL05|Monitor|KT02|7|0|0
+AL06|Headset|KT03|3|0|0
+AL07|Speaker|KT02|5|0|0
+AL08|Kamera|KT03|5|0|0
+AL09|LCD Proyektor|KT03|3|0|0
+AL10|Scanner|KT03|5|0|0

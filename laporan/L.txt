@@ -1,0 +1,16 @@
+=====================================
+   LAPORAN SISTEM PEMINJAMAN ALAT
+=====================================
+
+Total Transaksi: 1
+Transaksi Selesai: 1
+Transaksi Aktif: 0
+
+--- 5 Alat Paling Sering Dipinjam ---
+1. Router (5 unit)
+
+--- 5 Mahasiswa Teraktif ---
+1. budi (1 transaksi)
+
+--- Daftar Alat Rusak ---
+Tidak ada alat rusak.
