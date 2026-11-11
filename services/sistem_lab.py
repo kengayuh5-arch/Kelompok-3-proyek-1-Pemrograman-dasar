@@ -16,90 +16,66 @@ class SistemLab:
         self.log = []
         self.counter_transaksi = 0
         
-        # Inisialisasi FileHandler
         self.file_handler = FileHandler()
     
-    # ==========================================
-    # FUNGSI LOAD & SAVE (FILE I/O)
-    # ==========================================
     def muat_data_awal(self):
         
-        # 1. Muat Kategori
         for data in self.file_handler.muat_kategori():
             ktg = KategoriAlat.from_string(data)
             if ktg:
                 self.kategori[ktg.getId()] = ktg
                 
-        # 2. Muat Mahasiswa
         for data in self.file_handler.muat_mahasiswa():
             mhs = Mahasiswa.from_string(data)
             if mhs:
                 self.mahasiswa[mhs.getNim()] = mhs
                 
-        # 3. Muat Alat (Butuh referensi Kategori)
         for data in self.file_handler.muat_alat():
             alt = Alat.from_string(data, self.kategori)
             if alt:
                 self.alat[alt.getKode()] = alt
                 
-        # 4. Muat Transaksi (Butuh referensi Mahasiswa)
         for data in self.file_handler.muat_transaksi():
             trx = Transaksi.from_string(data, self.mahasiswa)
             if trx:
                 self.transaksi[trx.getIdTransaksi()] = trx
-                # Simpan counter tertinggi agar ID selanjutnya tidak bentrok
                 angka_id = int(trx.getIdTransaksi().replace("TRX", ""))
                 if angka_id > self.counter_transaksi:
                     self.counter_transaksi = angka_id
 
-        # 5. Muat Detail Transaksi (Butuh referensi Alat dan Transaksi)
         for data in self.file_handler.muat_detail():
-            # Ambil ID Transaksi dari data string (elemen pertama)
             id_trx = data.split("|")[0]
             if id_trx in self.transaksi:
                 detail = DetailPeminjaman.from_string(data, self.alat)
                 if detail:
                     self.transaksi[id_trx].daftar_detail.append(detail)
                     
-        # 6. Muat Log
         for data in self.file_handler.muat_log():
             log = LogAktivitas.from_string(data)
             if log:
                 self.log.append(log)
-        # (Log dibaca dari file, meskipun di aplikasi kita hanya menampilkan 20 terakhir)
-        # Karena format log di file sedikit beda, kita abaikan load log ke memori 
-        # untuk mencegah error parsing, karena log lama sudah ada di txt.
 
     def simpan_semua_data(self):
         """Menyimpan seluruh state memori ke file txt (biasanya dipanggil saat exit)"""
-        # 1. Simpan Kategori
         list_ktg = [k.to_string() for k in self.kategori.values()]
         self.file_handler.simpan_kategori(list_ktg)
         
-        # 2. Simpan Mahasiswa
         list_mhs = [m.to_string() for m in self.mahasiswa.values()]
         self.file_handler.simpan_mahasiswa(list_mhs)
         
-        # 3. Simpan Alat
         list_alat = [a.to_string() for a in self.alat.values()]
         self.file_handler.simpan_alat(list_alat)
         
-        # 4. Simpan Transaksi
         list_trx = [t.to_string() for t in self.transaksi.values()]
         self.file_handler.simpan_transaksi(list_trx)
         
-        # 5. Simpan Detail Transaksi
         list_detail = []
         for trx in self.transaksi.values():
             for detail in trx.getDaftarDetail():
-                # Format: IDTransaksi|KodeAlat|Jumlah|SudahKembali|Kondisi|Tgl
                 str_detail = detail.to_string()
                 list_detail.append(f"{trx.getIdTransaksi()}|{str_detail}")
         self.file_handler.simpan_detail(list_detail)
 
-    # ==========================================
-    # HELPER / UTILITY
-    # ==========================================
     def catatLog(self, pesan):
         log_baru = LogAktivitas(pesan)
         self.log.append(log_baru)
@@ -128,9 +104,6 @@ class SistemLab:
             raise ValueError(f"Mahasiswa {nim} sudah mencapai batas maksimal {MAKS_TRANSAKSI_AKTIF} transaksi aktif!")
         return True
 
-    # ==========================================
-    # CRUD MAHASISWA
-    # ==========================================
     def tambahMahasiswa(self, nim, nama, no_hp):
         if nim in self.mahasiswa:
             raise ValueError(f"Mahasiswa dengan NIM {nim} sudah terdaftar")
@@ -160,9 +133,6 @@ class SistemLab:
         self.simpan_semua_data()
         self.catatLog(f"Mahasiswa {nim} ({mhs.getNama()}) dihapus")
 
-    # ==========================================
-    # CRUD KATEGORI & ALAT
-    # ==========================================
     def tambahKategori(self, id_kategori, nama, deskripsi=""):
         if id_kategori in self.kategori:
             raise ValueError(f"Kategori {id_kategori} sudah ada!")
@@ -214,9 +184,6 @@ class SistemLab:
         self.simpan_semua_data()
         self.catatLog(f"Alat {kode} ({nama}) dihapus")
 
-    # ==========================================
-    # TRANSAKSI
-    # ==========================================
     def buatTransaksi(self, nim, daftar_item):
         if nim not in self.mahasiswa:
             raise ValueError(f"Mahasiswa dengan NIM {nim} tidak ditemukan")
@@ -226,7 +193,6 @@ class SistemLab:
         if not daftar_item or len(daftar_item) == 0:
             raise ValueError("Transaksi harus punya minimal 1 alat")
         
-        # --- GABUNGKAN KODE ALAT YANG SAMA DULU ---
         item_digabung = {}
         for kode, jumlah in daftar_item:
             if kode in item_digabung:
@@ -234,7 +200,6 @@ class SistemLab:
             else:
                 item_digabung[kode] = jumlah
         
-        # Validasi Stok berdasarkan total gabungan
         for kode, total_jumlah in item_digabung.items():
             if kode not in self.alat:
                 raise ValueError(f"Alat {kode} tidak ditemukan!")
@@ -246,12 +211,10 @@ class SistemLab:
             if total_jumlah > alat.getStokBaik():
                 raise ValueError(f"Stok {alat.getNama()} tidak cukup! Tersedia: {alat.getStokBaik()}, diminta: {total_jumlah}")
         
-        # Generate ID dan buat transaksi
         id_trx = self.generateIdTransaksi()
         mhs = self.mahasiswa[nim]
         trx = Transaksi(id_trx, mhs)
         
-        # Masukkan data yang sudah digabung ke dalam transaksi
         for kode, total_jumlah in item_digabung.items():
             trx.tambahDetail(self.alat[kode], total_jumlah)
         
@@ -275,9 +238,6 @@ class SistemLab:
         self.simpan_semua_data() # Simpan perubahan detail, status transaksi, dan stok Alat
         self.catatLog(f"{trx.getMahasiswa().getNama()} mengembalikan {kode_alat} (kondisi: {kondisi}) di transaksi {id_trx}")
 
-    # ==========================================
-    # GETTER / QUERY (Sama seperti Project 1)
-    # ==========================================
     def getMahasiswa(self, nim):
         if nim not in self.mahasiswa:
             raise ValueError(f"Mahasiswa {nim} tidak ditemukan")

@@ -39,7 +39,6 @@ class DetailPeminjaman:
             status = "Belum kembali"
         return f"{self.alat.getNama()} x {self.jumlah} [{self.alat.getKode()}] - {status}"
 
-    # --- UNTUK FILE I/O ---
     def to_string(self):
         kembali = 1 if self.sudahKembali else 0
         tgl = self.tanggalKembali.strftime("%Y-%m-%d") if self.tanggalKembali else "-"
@@ -49,7 +48,7 @@ class DetailPeminjaman:
     @staticmethod
     def from_string(data, dict_alat):
         parts = data.split("|")
-        if len(parts) == 6: # Harus 6 karena ada ID_TRX
+        if len(parts) == 6:
             kode_alat = parts[1]
             jumlah = parts[2]
             kembali = parts[3]
@@ -58,7 +57,6 @@ class DetailPeminjaman:
             
             if kode_alat in dict_alat:
                 detail = DetailPeminjaman(dict_alat[kode_alat], int(jumlah))
-                # Terima 1/0
                 if kembali == "1":
                     detail.sudahKembali = True
                     detail.kondisiKembali = kondisi if kondisi != "-" else None
