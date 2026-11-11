@@ -78,7 +78,6 @@ class Transaksi:
                 baris.append(f"    - {d.getDetail()}")
         return "\n".join(baris)
 
-    # --- UNTUK FILE I/O ---
     def to_string(self):
         tgl_pinjam = self.tanggal_pinjam.strftime("%Y-%m-%d")
         tgl_batas = self.batas_kembali.strftime("%Y-%m-%d")
