@@ -1,1 +1,3 @@
 KT01|Jaringan|
+KT02|Komputasi|
+KT03|Multimedia|

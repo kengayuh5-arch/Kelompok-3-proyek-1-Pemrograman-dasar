@@ -1,0 +1,27 @@
+2026-11-11 17:25|Mahasiswa K123 (budi) ditambahkan
+2026-11-11 17:31|Kategori KT01 (Jaringan) ditambahkan
+2026-11-11 17:35|Alat AL01 (Router) ditambahkan
+2026-11-11 17:37|Data alat AL01 diperbarui
+2026-11-11 17:43|Transaksi TRX001 dibuat oleh budi: AL01 x 5
+2026-11-11 17:47|budi mengembalikan AL01 (kondisi: rusak ringan) di transaksi TRX001
+2026-11-11 17:51|Data alat AL01 diperbarui
+2026-11-12 03:40|Mahasiswa K1234 (jamal) ditambahkan
+2026-11-12 03:42|Mahasiswa K001 (siti) ditambahkan
+2026-11-12 03:43|Mahasiswa K002 (ibnu) ditambahkan
+2026-11-12 03:43|Mahasiswa K003 (putri) ditambahkan
+2026-11-12 03:46|Kategori KT02 (Komputasi) ditambahkan
+2026-11-12 03:46|Kategori KT03 (Multimedia) ditambahkan
+2026-11-12 03:47|Alat AL02 (switch) ditambahkan
+2026-11-12 03:49|Alat AL03 (Keyboard) ditambahkan
+2026-11-12 03:50|Alat AL04 (Mouse) ditambahkan
+2026-11-12 03:50|Alat AL05 (Monitor) ditambahkan
+2026-11-12 03:51|Alat AL06 (Headset) ditambahkan
+2026-11-12 03:52|Alat AL07 (Speaker) ditambahkan
+2026-11-12 03:53|Alat AL08 (Kamera) ditambahkan
+2026-11-12 03:54|Alat AL09 (LCD) ditambahkan
+2026-11-12 03:55|Data alat AL09 diperbarui
+2026-11-12 03:56|Alat AL10 (Scanner) ditambahkan
+2026-11-12 03:56|Data alat AL04 diperbarui
+2026-11-12 03:56|Data alat AL06 diperbarui
+2026-11-12 03:58|Transaksi TRX002 dibuat oleh siti: AL03 x 2
+2026-11-12 03:59|Transaksi TRX003 dibuat oleh putri: AL01 x 2, AL02 x 1
