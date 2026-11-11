@@ -1,0 +1,7 @@
+2026-11-11 17:25|Mahasiswa K123 (budi) ditambahkan
+2026-11-11 17:31|Kategori KT01 (Jaringan) ditambahkan
+2026-11-11 17:35|Alat AL01 (Router) ditambahkan
+2026-11-11 17:37|Data alat AL01 diperbarui
+2026-11-11 17:43|Transaksi TRX001 dibuat oleh budi: AL01 x 5
+2026-11-11 17:47|budi mengembalikan AL01 (kondisi: rusak ringan) di transaksi TRX001
+2026-11-11 17:51|Data alat AL01 diperbarui
