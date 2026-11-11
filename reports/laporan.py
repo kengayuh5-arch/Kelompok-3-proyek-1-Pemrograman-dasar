@@ -1,6 +1,5 @@
 from services.sistem_lab import SistemLab
 
-
 class Laporan:
     def __init__(self, sistem):
         if type(sistem) != SistemLab:
@@ -9,64 +8,133 @@ class Laporan:
     
     def alatTersedia(self):
         return self.sistem.getAlatTersedia()
-    
     def alatDipinjam(self):
         return self.sistem.getAlatDipinjam()
-    
     def alatRusak(self):
         return self.sistem.getAlatRusak()
-    
     def riwayatMahasiswa(self, nim):
         return self.sistem.cariTransaksiByMahasiswa(nim)
-    
     def cariTransaksiByMahasiswa(self, nim):
         return self.sistem.cariTransaksiByMahasiswa(nim)
-    
-    def statistik(self):
-        hitung_alat = {}
+
+
+    def alatPalingSeringDipinjam(self):
+        hitung = {}
         for trx in self.sistem.transaksi.values():
             for detail in trx.getDaftarDetail():
                 nama = detail.getAlat().getNama()
-                jumlah = detail.getJumlah()
-                if nama not in hitung_alat:
-                    hitung_alat[nama] = 0
-                hitung_alat[nama] = hitung_alat[nama] + jumlah
-        
-        alat_terpopuler = sorted(
-            hitung_alat.items(),
-            key=lambda x: x[1],
-            reverse=True
-        )
-        
-        hitung_mhs = {}
+                hitung[nama] = hitung.get(nama, 0) + detail.getJumlah()
+        return sorted(hitung.items(), key=lambda x: x[1], reverse=True)
+
+    def mahasiswaPalingSeringMeminjam(self):
+        hitung = {}
         for trx in self.sistem.transaksi.values():
             nama = trx.getMahasiswa().getNama()
-            if nama not in hitung_mhs:
-                hitung_mhs[nama] = 0
-            hitung_mhs[nama] = hitung_mhs[nama] + 1
+            hitung[nama] = hitung.get(nama, 0) + 1
+        return sorted(hitung.items(), key=lambda x: x[1], reverse=True)
+
+    def jumlahTransaksiSelesai(self):
+        return sum(1 for trx in self.sistem.transaksi.values() if trx.getStatus() == "selesai")
+
+    def jumlahTransaksiAktif(self):
+        return sum(1 for trx in self.sistem.transaksi.values() if trx.getStatus() != "selesai")
+
+
+    def buat_teks_laporan(self):
+        teks = "=====================================\n"
+        teks += "   LAPORAN SISTEM PEMINJAMAN ALAT\n"
+        teks += "=====================================\n\n"
         
-        mahasiswa_teraktif = sorted(
-            hitung_mhs.items(),
-            key=lambda x: x[1],
-            reverse=True
-        )
+        teks += f"Total Transaksi: {len(self.sistem.transaksi)}\n"
+        teks += f"Transaksi Selesai: {self.jumlahTransaksiSelesai()}\n"
+        teks += f"Transaksi Aktif: {self.jumlahTransaksiAktif()}\n\n"
         
-        selesai = 0
-        aktif = 0
-        for trx in self.sistem.transaksi.values():
-            if trx.getStatus() == "selesai":
-                selesai = selesai + 1
-            else:
-                aktif = aktif + 1
-        
-        return {
-            "alat_terpopuler": alat_terpopuler,
-            "mahasiswa_teraktif": mahasiswa_teraktif,
-            "transaksi_selesai": selesai,
-            "transaksi_aktif": aktif,
-            "total_transaksi": len(self.sistem.transaksi)
-        }
+        teks += "--- 5 Alat Paling Sering Dipinjam ---\n"
+        for i, (nama, jml) in enumerate(self.alatPalingSeringDipinjam()[:5], 1):
+            teks += f"{i}. {nama} ({jml} unit)\n"
+            
+        teks += "\n--- 5 Mahasiswa Teraktif ---\n"
+        for i, (nama, jml) in enumerate(self.mahasiswaPalingSeringMeminjam()[:5], 1):
+            teks += f"{i}. {nama} ({jml} transaksi)\n"
+            
+        teks += "\n--- Daftar Alat Rusak ---\n"
+        rusak = self.alatRusak()
+        if not rusak:
+            teks += "Tidak ada alat rusak.\n"
+        else:
+            for a in rusak:
+                teks += f"- {a.getNama()} (Baik: {a.getStokBaik()}, R.Ringan: {a.getStokRusakRingan()}, R.Berat: {a.getStokRusakBerat()})\n"
+        return teks
+
+
+    def cetakAlatTersedia(self):
+        print("\n===== Alat Tersedia =====")
+        daftar = self.alatTersedia()
+        if len(daftar) == 0:
+            print("(Tidak ada alat tersedia)")
+            return
+        print(f"{'KODE':<10} | {'NAMA':<15} | {'KATEGORI':<20} | STOK BAIK")
+        print("-" * 65)
+        for a in daftar:
+            print(f"{a.getKode():<10} | {a.getNama():<15} | {a.getKategori().getNama():<20} | {a.getStokBaik()}")
+        print(f"Total: {len(daftar)} alat")
     
+    def cetakAlatDipinjam(self):
+        print("\n===== Alat Sedang Dipinjam =====")
+        daftar = self.alatDipinjam()
+        if len(daftar) == 0:
+            print("(Tidak ada alat sedang dipinjam)")
+            return
+        print(f"{'KODE':<10} | {'NAMA':<15} | {'KATEGORI':<20} | STOK BAIK")
+        print("-" * 65)
+        for a in daftar:
+            print(f"{a.getKode():<10} | {a.getNama():<15} | {a.getKategori().getNama():<20} | {a.getStokBaik()}")
+        print(f"Total: {len(daftar)} alat")
+    
+    def cetakAlatRusak(self):
+        print("\n===== Alat Rusak =====")
+        daftar = self.alatRusak()
+        if len(daftar) == 0:
+            print("(Tidak ada alat rusak)")
+            return
+        print(f"{'KODE':<10} | {'NAMA':<15} | {'KATEGORI':<20} | RUSAK RINGAN | RUSAK BERAT")
+        print("-" * 85)
+        for a in daftar:
+            print(f"{a.getKode():<10} | {a.getNama():<15} | {a.getKategori().getNama():<20} | {a.getStokRusakRingan():<12} | {a.getStokRusakBerat()}")
+        print(f"Total: {len(daftar)} alat")
+    
+    def cetakRiwayatMahasiswa(self, nim):
+        print(f"\n===== Riwayat Peminjaman: {nim} =====")
+        try:
+            daftar = self.riwayatMahasiswa(nim)
+        except ValueError as e:
+            print(f"Error: {e}")
+            return
+        if len(daftar) == 0:
+            print("(Belum ada riwayat transaksi)")
+            return
+        mhs = self.sistem.getMahasiswa(nim)
+        print(f"Mahasiswa: {mhs.getNama()}")
+        print(f"Total transaksi: {len(daftar)}\n")
+        for trx in daftar:
+            print(trx.getDetail())
+            print()
+    
+    def cetakStatistik(self):
+        print("\n===== Statistik Peminjaman =====")
+        print(f"Total transaksi   : {len(self.sistem.transaksi)}")
+        print(f"  - Selesai       : {self.jumlahTransaksiSelesai()}")
+        print(f"  - Aktif         : {self.jumlahTransaksiAktif()}\n")
+        
+        print("Alat Terpopuler:")
+        for i, (nama, jml) in enumerate(self.alatPalingSeringDipinjam()[:5], 1):
+            print(f"  {i}. {nama} - {jml} unit")
+        print()
+        
+        print("Mahasiswa Teraktif:")
+        for i, (nama, jml) in enumerate(self.mahasiswaPalingSeringMeminjam()[:5], 1):
+            print(f"  {i}. {nama} - {jml} transaksi")
+
     def ringkasanHariIni(self):
         from datetime import date
         hari_ini = date.today()
@@ -75,118 +143,12 @@ class Laporan:
         
         for trx in self.sistem.transaksi.values():
             if trx.getTanggalPinjam() == hari_ini:
-                jumlah_trx = jumlah_trx + 1
+                jumlah_trx += 1
                 for detail in trx.getDaftarDetail():
-                    jumlah_alat = jumlah_alat + detail.getJumlah()
+                    jumlah_alat += detail.getJumlah()
         
         return {
             "tanggal": hari_ini,
             "jumlah_transaksi": jumlah_trx,
             "jumlah_alat_dipinjam": jumlah_alat
         }
-    
-    def cetakAlatTersedia(self):
-        print("\n===== Alat Tersedia =====")
-        daftar = self.alatTersedia()
-        
-        if len(daftar) == 0:
-            print("(Tidak ada alat tersedia)")
-            return
-        
-        print(f"{'KODE':<10} | {'NAMA':<15} | {'KATEGORI':<20} | STOK BAIK")
-        print("-" * 65)
-        for a in daftar:
-            print(
-                f"{a.getKode():<10} | "
-                f"{a.getNama():<15} | "
-                f"{a.getKategori().getNama():<20} | "
-                f"{a.getStokBaik()}"
-            )
-        print(f"Total: {len(daftar)} alat")
-    
-    def cetakAlatDipinjam(self):
-        print("\n===== Alat Sedang Dipinjam =====")
-        daftar = self.alatDipinjam()
-        
-        if len(daftar) == 0:
-            print("(Tidak ada alat sedang dipinjam)")
-            return
-        
-        print(f"{'KODE':<10} | {'NAMA':<15} | {'KATEGORI':<20} | STOK BAIK")
-        print("-" * 65)
-        for a in daftar:
-            print(
-                f"{a.getKode():<10} | "
-                f"{a.getNama():<15} | "
-                f"{a.getKategori().getNama():<20} | "
-                f"{a.getStokBaik()}"
-            )
-        print(f"Total: {len(daftar)} alat")
-    
-    def cetakAlatRusak(self):
-        print("\n===== Alat Rusak =====")
-        daftar = self.alatRusak()
-        
-        if len(daftar) == 0:
-            print("(Tidak ada alat rusak)")
-            return
-        
-        print(f"{'KODE':<10} | {'NAMA':<15} | {'KATEGORI':<20} | RUSAK RINGAN | RUSAK BERAT")
-        print("-" * 85)
-        for a in daftar:
-            print(
-                f"{a.getKode():<10} | "
-                f"{a.getNama():<15} | "
-                f"{a.getKategori().getNama():<20} | "
-                f"{a.getStokRusakRingan():<12} | "
-                f"{a.getStokRusakBerat()}"
-            )
-        print(f"Total: {len(daftar)} alat")
-    
-    def cetakRiwayatMahasiswa(self, nim):
-        print(f"\n===== Riwayat Peminjaman: {nim} =====")
-        
-        try:
-            daftar = self.riwayatMahasiswa(nim)
-        except ValueError as e:
-            print(f"Error: {e}")
-            return
-        
-        if len(daftar) == 0:
-            print("(Belum ada riwayat transaksi)")
-            return
-        
-        mhs = self.sistem.getMahasiswa(nim)
-        print(f"Mahasiswa: {mhs.getNama()}")
-        print(f"Total transaksi: {len(daftar)}")
-        print()
-        
-        for trx in daftar:
-            print(trx.getDetail())
-            print()
-    
-    def cetakStatistik(self):
-        print("\n===== Statistik Peminjaman =====")
-        
-        stat = self.statistik()
-        
-        print(f"Total transaksi   : {stat['total_transaksi']}")
-        print(f"  - Selesai       : {stat['transaksi_selesai']}")
-        print(f"  - Aktif         : {stat['transaksi_aktif']}")
-        print()
-        
-        print("Alat Terpopuler:")
-        if len(stat["alat_terpopuler"]) == 0:
-            print("  (Belum ada data)")
-        else:
-            for i, (nama, jumlah) in enumerate(stat["alat_terpopuler"][:5], start=1):
-                print(f"  {i}. {nama} - {jumlah} unit dipinjam")
-        print()
-        
-        print("Mahasiswa Teraktif:")
-        if len(stat["mahasiswa_teraktif"]) == 0:
-            print("  (Belum ada data)")
-        else:
-            for i, (nama, jumlah) in enumerate(stat["mahasiswa_teraktif"][:5], start=1):
-                print(f"  {i}. {nama} - {jumlah} transaksi")
-
