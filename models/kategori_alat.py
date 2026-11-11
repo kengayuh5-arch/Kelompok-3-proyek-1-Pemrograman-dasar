@@ -17,20 +17,19 @@ class KategoriAlat:
     def getNama(self):
         return self.nama
     
-    def getDeskripsi(self):
-        return self.deskripsi
-    
-    def ubahNama(self, nama_baru):
-        if not nama_baru or type(nama_baru) != str:
-            raise ValueError("Nama kategori tidak boleh kosong!")
-        self.nama = nama_baru
-    
-    def ubahDeskripsi(self, deskripsi_baru):
-        if type(deskripsi_baru) != str:
-            raise ValueError("Deskripsi harus berupa string!")
-        self.deskripsi = deskripsi_baru
-    
     def getDetail(self):
         if self.deskripsi:
             return f"[{self.id_kategori}] {self.nama} — {self.deskripsi}"
         return f"[{self.id_kategori}] {self.nama}"
+
+    def to_string(self):
+        return f"{self.id_kategori}|{self.nama}|{self.deskripsi}"
+
+    
+    @staticmethod
+    def from_string(data):
+        parts = data.split("|")
+        if len(parts) >= 2:
+            deskripsi = parts[2] if len(parts) > 2 else ""
+            return KategoriAlat(parts[0], parts[1], deskripsi)
+        return None
